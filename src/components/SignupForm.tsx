@@ -93,11 +93,11 @@ export function SignupForm() {
           <select
             name="nama"
             id="nama"
-            className={style}
+            className={style + " capitalize"}
             onChange={(e) => setNama(e.target.value)}
           >
             {dataPst[String(kelas)]?.map((e: string, idx: number) => (
-              <option value={e} key={idx}>
+              <option className=" capitalize" value={e} key={idx}>
                 {e}
               </option>
             ))}

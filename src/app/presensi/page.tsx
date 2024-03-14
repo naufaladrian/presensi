@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { Tabs } from "@/components/ui/tabs";
+import Link from "next/link";
 
 const getData = async () => {
   const res = await fetch("http://localhost:3000/api/absensi");
@@ -46,6 +47,9 @@ export default async function page() {
 
   return (
     <div className="dark h-[20rem] md:h-[40rem] [perspective:1000px] relative b flex flex-col max-w-5xl mx-auto w-full  items-start justify-start my-10">
+      <Link href="/" className="z-50 text-md font-medium cursor-pointer my-4">
+        &larr; Home
+      </Link>
       <Tabs tabs={tabs} />
     </div>
   );
