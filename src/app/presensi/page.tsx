@@ -1,27 +1,13 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs } from "@/components/ui/tabs";
 import Link from "next/link";
 
 export default function page() {
-  const [query, setQuery] = useState(""); // search query
   const [filterDate, setFilterDate] = useState(""); // state for filter date
-
+  const [filteredData, setFilteredData] = useState([]); // state for filtered data
   const [dataAbsen, setDataAbsen] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [tableLoading, setTableLoading] = useState(true);
-
-  const handleDateChange = (e: any) => {
-    setFilterDate(e.target.value);
-  };
-
-  const filteredData = useMemo(() => {
-    if (!filterDate) return dataAbsen;
-    return dataAbsen.filter(
-      (item: any) =>
-        new Date(item.tanggalAbsen).toISOString().split("T")[0] === filterDate
-    );
-  }, [dataAbsen, filterDate]);
 
   useEffect(() => {
     const getData = async () => {
@@ -36,6 +22,7 @@ export default function page() {
           };
         });
         setDataAbsen(formattedData);
+        setFilteredData(formattedData);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -45,6 +32,16 @@ export default function page() {
 
     getData();
   }, []);
+
+  useEffect(() => {
+    if (filterDate === "") {
+      setFilteredData(dataAbsen);
+    } else {
+      setFilteredData(
+        dataAbsen.filter((item: any) => item.tanggalAbsen === filterDate)
+      );
+    }
+  }, [filterDate]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -61,20 +58,11 @@ export default function page() {
             type="date"
             name="tanggal"
             id="tanggal"
-            // value={filterDate}
-            onChange={handleDateChange}
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
             className="w-full p-4 my-4 rounded-md text-purple-700 text-md"
           />
-          {
-            // Jika tidak ada data yang ditemukan
-            filteredData.length === 0 ? (
-              <p className="text-center text-2xl font-medium text-white">
-                Tidak ada data yang ditemukan
-              </p>
-            ) : (
-              <WebTable data={filteredData} />
-            )
-          }
+          <WebTable data={filteredData} />
         </div>
       ),
     },
