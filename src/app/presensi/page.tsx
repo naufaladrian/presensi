@@ -1,16 +1,54 @@
-import React from "react";
-import Image from "next/image";
+"use client";
+import React, { useState, useEffect, useMemo } from "react";
 import { Tabs } from "@/components/ui/tabs";
 import Link from "next/link";
 
-const getData = async () => {
-  const res = await fetch("http://localhost:3000/api/absensi");
-  const data = await res.json();
-  return data.datas;
-};
+export default function page() {
+  const [query, setQuery] = useState(""); // search query
+  const [filterDate, setFilterDate] = useState(""); // state for filter date
 
-export default async function page() {
-  const dataAbsen = await getData();
+  const [dataAbsen, setDataAbsen] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
+
+  const handleDateChange = (e: any) => {
+    setFilterDate(e.target.value);
+  };
+
+  const filteredData = useMemo(() => {
+    if (!filterDate) return dataAbsen;
+    return dataAbsen.filter(
+      (item: any) =>
+        new Date(item.tanggalAbsen).toISOString().split("T")[0] === filterDate
+    );
+  }, [dataAbsen, filterDate]);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/absensi");
+        const data = await res.json();
+        // Memformat nilai tanggalAbsen
+        const formattedData = data.datas.map((item: any) => {
+          return {
+            ...item,
+            tanggalAbsen: item.tanggalAbsen.substring(0, 10),
+          };
+        });
+        setDataAbsen(formattedData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    getData();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   const tabs = [
     {
@@ -19,7 +57,24 @@ export default async function page() {
       content: (
         <div className="w-full overflow-hidden relative h-full rounded-2xl p-4 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-purple-700 to-violet-900">
           <p>Web Programming</p>
-          <WebTable data={dataAbsen} />
+          <input
+            type="date"
+            name="tanggal"
+            id="tanggal"
+            // value={filterDate}
+            onChange={handleDateChange}
+            className="w-full p-4 my-4 rounded-md text-purple-700 text-md"
+          />
+          {
+            // Jika tidak ada data yang ditemukan
+            filteredData.length === 0 ? (
+              <p className="text-center text-2xl font-medium text-white">
+                Tidak ada data yang ditemukan
+              </p>
+            ) : (
+              <WebTable data={filteredData} />
+            )
+          }
         </div>
       ),
     },
@@ -72,13 +127,13 @@ const LayoutTable = ({ children }: any) => {
                     #
                   </th>
                   <th scope="col" className="px-6 py-4">
-                    First
+                    Nama
                   </th>
                   <th scope="col" className="px-6 py-4">
-                    Last
+                    Kelas
                   </th>
                   <th scope="col" className="px-6 py-4">
-                    Handle
+                    Tanggal Absen
                   </th>
                 </tr>
               </thead>
@@ -112,7 +167,6 @@ const WebTable = ({ data }: any) => {
     </LayoutTable>
   );
 };
-
 const MobileTable = ({ data }: any) => {
   return (
     <LayoutTable>
