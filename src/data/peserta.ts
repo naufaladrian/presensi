@@ -62,6 +62,7 @@ const dataPeserta = {
             "zikry dwi maulana",
         ],
         "Mobile Programming": [
+            "alfaturachman maulana pahlevi",
             "alfinda rachamadani triutami",
             "aliyah zahratu rizqi",
             "aritza ganendra kusuma",
@@ -78,7 +79,6 @@ const dataPeserta = {
             "khalisa aulia azahra",
             "mohamad adzka fawaid",
             "muhammad faris assami",
-            "nama lengkap",
             "primavieri rhesa ardana",
             "raras anindya farani",
             "satrio puser bumi",
